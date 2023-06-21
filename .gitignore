@@ -1,0 +1,6 @@
+/node_modules
+/pdf/*.pdf
+/log/*
+/config/*.json
+dev.js
+/chromium
