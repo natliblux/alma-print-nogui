@@ -2,6 +2,7 @@
 
 //Modules:
 const almaPrint = require("./alma-print.js");
+const log = require("./log.js");
 
 //Global variables:
 const configFileName = "config/config.json";
@@ -28,6 +29,7 @@ function error(Message){
 
 //Main:
 Promise.resolve()
+.then(log.init)
 .then(getPrinters)
 .then(report)
 .catch(error)
