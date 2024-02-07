@@ -74,11 +74,17 @@ async function puppeteerStopBrowser(){
     if(puppetBrowser){await puppetBrowser.close()}
 }//------------------------------------------------------------------------------------------
 
-async function puppeteerPDF(html,format,marginTop,marginBottom,marginLeft,marginRight){
+async function puppeteerPDF(html,format,orientation,marginTop,marginBottom,marginLeft,marginRight){
     // To prevent issues a new page is created and closed afterwards
     var puppetPage = await puppetBrowser.newPage();
     await puppetPage.setContent(html, {waitUntil: "domcontentloaded"});
-    var result =  await puppetPage.pdf({format:format,margin:{top:marginTop,bottom:marginBottom,left:marginLeft,right:marginRight}});
+    var options
+    if (orientation == "portrait"){
+        options = {format:format,margin:{top:marginTop,bottom:marginBottom,left:marginLeft,right:marginRight}}
+    }else if(orientation == "landscape"){
+        options = {format:format,landscape:true,margin:{top:marginTop,bottom:marginBottom,left:marginLeft,right:marginRight}}
+    }
+    var result =  await puppetPage.pdf(options);
     await puppetPage.close();
     return result;
 }//------------------------------------------------------------------------------------------
@@ -127,7 +133,7 @@ async function printLetter(input){
 
     for([index,localPrinter] of localPrinterArray.entries()){
         var filename = path.join(__dirname,"pdf",`${id}-${index}.pdf`);
-        var pdf = await puppeteerPDF(letter,localPrinter.letterFormat,localPrinter.marginTop,localPrinter.marginBottom,localPrinter.marginLeft,localPrinter.marginRight);
+        var pdf = await puppeteerPDF(letter,localPrinter.letterFormat,localPrinter.orientation,localPrinter.marginTop,localPrinter.marginBottom,localPrinter.marginLeft,localPrinter.marginRight);
         await fs.writeFile(filename,pdf);
         log.info(`Letter: ${id} destination Printer: ${localPrinter.localPrinter}`)
         await pdfPrinter.print(filename,{
